@@ -2,16 +2,19 @@ package com.pdianalyzer.domain.repository;
 
 import com.pdianalyzer.domain.model.Cargo;
 import com.smarthirepro.domain.model.Empresa;
+import com.smarthirepro.domain.repositories.CargoRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
 @Repository
-public interface CargoRepositoryJpa extends JpaRepository<Cargo, UUID> {
+public interface CargoRepositoryJpa extends JpaRepository<Cargo, UUID>, CargoRepository<Cargo> {
 
+    Optional<Cargo> findById(UUID var1);
 
     List<Cargo> findByEmpresaId(UUID empresaId);
 

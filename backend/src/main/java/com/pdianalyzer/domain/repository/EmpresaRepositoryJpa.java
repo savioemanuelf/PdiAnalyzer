@@ -19,5 +19,11 @@ public interface EmpresaRepositoryJpa
     @Override
     Optional<Empresa> findByCnpj(String cnpj);
 
+    @Override
+    Empresa save(Empresa empresa);
+
+    @Override
+    Optional<Empresa> findById(UUID empresaId);
+
     List<Empresa> findByNomeIgnoreCase(String nomeEmpresa);
 }

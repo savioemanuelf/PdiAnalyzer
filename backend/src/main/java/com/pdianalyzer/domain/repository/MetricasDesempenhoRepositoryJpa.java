@@ -9,7 +9,7 @@ import java.util.UUID;
 
 
 @Repository
-public interface CurriculoRepositoryJpa
-        extends JpaRepository<Curriculo, UUID>, CurriculoRepository {
+public interface MetricasDesempenhoRepositoryJpa
+  extends JpaRepository<Curriculo, UUID>, CurriculoRepository {
 
 }

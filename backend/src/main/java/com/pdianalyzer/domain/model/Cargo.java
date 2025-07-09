@@ -1,7 +1,11 @@
 package com.pdianalyzer.domain.model;
 
+import com.smarthirepro.domain.model.CargoGenerico;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -10,18 +14,13 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cargo {
+public class Cargo extends CargoGenerico {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @OneToOne
+    @JoinColumn(name = "nivel_id")
+    private Nivel nivel;
 
-    @Column(name = "empresa_id", nullable = false)
-    private UUID empresaId;
-
-    @Column(nullable = false, unique = true)
-    private String nome;
-
-    @Column(columnDefinition = "TEXT")
-    private String descricao;
+    @ManyToOne
+    @JoinColumn(name = "trilha_carreira_id")
+    private TrilhaDeCarreira trilhaDeCarreira;
 }
