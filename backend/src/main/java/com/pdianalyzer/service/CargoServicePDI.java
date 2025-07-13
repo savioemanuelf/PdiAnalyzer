@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +33,19 @@ public class CargoServicePDI {
   private final NivelRepositoryJpa nivelRepositoryJpa;
   private final EmpresaRepository empresaRepository;
 
-  public Cargo buscarPorId(UUID id) {
-    return cargoRepository.findById(id)
+  public CargoDto buscarPorId(UUID id) {
+    Cargo cargo = cargoRepository.findById(id)
       .orElseThrow(() -> new ItemNotFoundException("Cargo", id));
+    return new CargoDto(
+      cargo.getNome(),
+      cargo.isActive(),
+      cargo.getRequisitos().getHabilidades(),
+      cargo.getNivel().getId()
+    );
   }
 
   @Transactional
-  public Cargo criarCargo(CargoDto dto) {
+  public CargoDto criarCargo(CargoDto dto) {
     UUID empresaId = AuthUtils.getEmpresaId();
     Empresa empresa = empresaRepository.findById(empresaId)
       .orElseThrow(() -> new ItemNotFoundException("Empresa", empresaId));
@@ -70,13 +77,51 @@ public class CargoServicePDI {
     cargo.setRequisitos(requisitos);
     cargo.setNivel(nivel);
     cargo.setTrilhaDeCarreira(trilha);
-    return cargoRepository.save(cargo);
+    cargoRepository.save(cargo);
+    return dto;
   }
 
-  public List<Cargo> listarCargosPorEmpresa() {
+  public List<CargoDto> listarCargosPorEmpresa() {
     UUID empresaId = AuthUtils.getEmpresaId();
-    return cargoRepository.findByEmpresaId(empresaId);
+    List<Cargo> cargos = cargoRepository.findByEmpresaId(empresaId);
+    if (cargos.isEmpty()) {
+      throw new ItemNotFoundException("Cargo", empresaId);
+    }
+    return cargos
+      .stream()
+      .map(
+        cargo -> new CargoDto(
+          cargo.getNome(),
+          cargo.isActive(),
+          cargo.getRequisitos().getHabilidades(),
+          cargo.getNivel().getId()
+        )
+      )
+      .toList();
   }
 
-  // listarTodosPorTrilha(UUID trilhaId)
+  public List<CargoDto> listarCargosPorTrilha(UUID trilhaId) {
+    if (!trilhaDeCarreiraRepository.existsById(trilhaId)) {
+      throw new ItemNotFoundException("Trilha de Carreira", trilhaId);
+    }
+
+    List<Cargo> cargos = cargoRepository.findByTrilhaDeCarreira_Id(trilhaId);
+    if(cargos.isEmpty()) {
+      throw new PDIBusinessRuleException("Nenhum cargo foi criado para a trilha de carreira com ID: " + trilhaId);
+    }
+    return cargos.stream()
+      .map(cargo -> new CargoDto(
+        cargo.getNome(),
+        cargo.isActive(),
+        cargo.getRequisitos().getHabilidades(),
+        cargo.getNivel().getId()
+      ))
+      .collect(Collectors.toList());
+  }
+
+  public void excluirCargo(UUID id) {
+    Cargo cargo = cargoRepository.findById(id)
+      .orElseThrow(() -> new ItemNotFoundException("Cargo", id));
+    cargoRepository.delete(cargo);
+  }
 }

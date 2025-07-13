@@ -23,4 +23,6 @@ public interface CargoRepositoryJpa extends JpaRepository<Cargo, UUID>, CargoRep
     void deleteAllByEmpresaId(UUID id);
 
     boolean existsByNivelId(UUID nivelId);
+
+    List<Cargo> findByTrilhaDeCarreira_Id(UUID trilhaId);
 }
