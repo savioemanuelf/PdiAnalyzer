@@ -1,5 +1,6 @@
 package com.pdianalyzer.domain.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,7 +22,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Nivel {
 
     @Id
@@ -30,15 +30,19 @@ public class Nivel {
     private UUID id;
 
     private String senioridade;
+    private int ordem;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cargo_competencias_id")
     private CargoCompetencias cargoCompetencias;
-
-    private int ordem; // trainee 1, junior 2, pleno 3, sr 4, lider 5
 
     @OneToOne
     @JoinColumn(name = "proximo_nivel_id")
     private Nivel proximoNivel;
+
+    @ManyToOne
+    @JoinColumn(name = "trilha_de_carreira_id")
+    private TrilhaDeCarreira trilhaDeCarreira;
 
   }
 

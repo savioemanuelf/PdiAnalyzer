@@ -4,6 +4,7 @@ import com.smarthirepro.domain.model.CargoCompetenciasGenerico;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -14,4 +15,9 @@ import java.util.UUID;
 @DiscriminatorValue("PDI")
 public class CargoCompetencias extends CargoCompetenciasGenerico {
 
+  @Column(name = "competencias_tecnicas")
+  private String competenciasTecnicas;
+
+  @Column(name = "competencias_pessoais")
+  private String competenciasPessoais;
 }

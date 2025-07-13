@@ -16,11 +16,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Cargo extends CargoGenerico {
 
-    @OneToOne
-    @JoinColumn(name = "nivel_id")
-    private Nivel nivel;
+  @OneToOne
+  @JoinColumn(name = "nivel_id")
+  private Nivel nivel;
 
-    @ManyToOne
-    @JoinColumn(name = "trilha_carreira_id")
-    private TrilhaDeCarreira trilhaDeCarreira;
+  @ManyToOne
+  @JoinColumn(name = "trilha_carreira_id")
+  private TrilhaDeCarreira trilhaDeCarreira;
 }

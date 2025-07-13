@@ -16,6 +16,7 @@ import com.pdianalyzer.exception.ItemNotFoundException;
 import com.pdianalyzer.exception.PDIBusinessRuleException;
 import com.smarthirepro.core.exception.BusinessRuleException;
 import com.smarthirepro.core.security.AuthUtils;
+import com.smarthirepro.core.service.impl.CandidatoService;
 import com.smarthirepro.domain.model.Candidato;
 import com.smarthirepro.domain.model.Curriculo;
 import jakarta.transaction.Transactional;
@@ -32,52 +33,34 @@ import java.util.stream.Collectors;
 public class ColaboradorService {
 
   private final ColaboradorRepositoryJpa colaboradorRepository;
+  private final CandidatoService candidatoService;
   private final CargoRepositoryJpa cargoRepositoryJpa;
   private final EmpresaRepositoryJpa empresaRepositoryJpa;
   private final CargoServicePDI cargoServicePDI;
   private final MetricasDesempenhoRepositoryJpa metricasDesempenhoRepositoryJpa;
 
   @Transactional
-  public Colaborador criarColaboradorComCurriculo(MetricasDesempenho metricasDesempenho, UUID idCargo) {
-    if (metricasDesempenho == null) {
-      throw new PDIBusinessRuleException("Colaborador precisa possuir métricas de desempenho.");
-    }
-
-    verificarEmailEmUso(metricasDesempenho.getEmail());
-
-    Colaborador colaborador = new Colaborador();
-    colaborador.setCurriculo(metricasDesempenho);
-    colaborador.setNome(metricasDesempenho.getNome());
-    colaborador.setEmail(metricasDesempenho.getEmail());
-    colaborador.setTelefone(metricasDesempenho.getTelefone());
-
-    Cargo cargo = cargoServicePDI.listarPorId(idCargo);
-    colaborador.setCargo(cargo);
-
-    return colaboradorRepository.save(colaborador);
-  }
-
-  private void verificarEmailEmUso(String email) {
-    boolean emailEmUso = this.colaboradorRepository.findByEmail(email).isPresent();
-    if (emailEmUso) {
-      throw new BusinessRuleException("E-mail já cadastrado no sistema.");
-    }
-  }
-
-  @Transactional
   public Colaborador salvar(Colaborador colaborador) {
-    verificarEmailEmUso(colaborador.getEmail());
+    verificarEmailEmUso(colaborador.getEmail(), colaborador);
     return colaboradorRepository.save(colaborador);
   }
 
   public ColaboradorDto listarColaboradores(Colaborador colaborador) {
     Cargo cargo = colaborador.getCargo();
     MetricasDesempenho metricasDesempenho = colaborador.getMetricasDesempenho();
-    verificarNulidadeMetricasDesempenho(metricasDesempenho);
+    verificarNulidadeMetricasDesempenho(colaborador.getCurriculo());
 
     CargoDto cargoDto = null;
     if (cargo != null) {
-      cargoDto = new CargoDto(cargo.getId(), cargo.getNome());
+      cargoDto = new CargoDto(
+        cargo.getId(),
+        cargo.getNome(),
+        cargo.getEmpresa().getId(),
+        cargo.isActive(),
+        cargo.getRequisitos().getHabilidades(),
+        cargo.getTrilhaDeCarreira().getId(),
+        cargo.getNivel().getId()
+      );
     }
 
     return new ColaboradorDto(
@@ -117,34 +100,34 @@ public class ColaboradorService {
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
   }
-
-  public List<ColaboradorDto> buscarCandidatoPorNome(String nomeColaborador) {
-    List<Colaborador> colaboradores = colaboradorRepository.findByNomeContainingIgnoreCase(nomeColaborador);
-    List<ColaboradorDto> colaboradoresDto = colaboradores.stream()
-      .map(this::listarColaboradores)
-      .collect(Collectors.toList());
-    if (colaboradoresDto.isEmpty()) {
-      throw new PDIBusinessRuleException("Colaborador não encontrado.");
-    }
-    return colaboradoresDto;
-  }
-
-  public Candidato atualizarColaboradorPorId(UUID id, ColaboradorRequestDto data) {
-    Colaborador colaborador = colaboradorRepository.findById(id)
-      .orElseThrow(() -> new ItemNotFoundException("Colaborador", id));
-
-    MetricasDesempenho metricasDesempenho = metricasDesempenhoRepositoryJpa.findById(data.metricasDesempenhoId())
-      .orElseThrow(() -> new ItemNotFoundException("MétricasDesempenho", data.metricasDesempenhoId()));
-
-    Cargo cargo = cargoRepositoryJpa.findById(data.cargoId())
-      .orElseThrow(() -> new ItemNotFoundException("Cargo", data.cargoId()));
-
-    verificarNulidadeMetricasDesempenho(metricasDesempenho);
-    verificarCargoAtivo(cargo);
-    colaborador.atualizarCom(data, metricasDesempenho, cargo);
-
-    return colaboradorRepository.save(colaborador);
-  }
+//
+//  public List<ColaboradorDto> buscarCandidatoPorNome(String nomeColaborador) {
+//    List<Colaborador> colaboradores = colaboradorRepository.findByNomeContainingIgnoreCase(nomeColaborador);
+//    List<ColaboradorDto> colaboradoresDto = colaboradores.stream()
+//      .map(this::listarColaboradores)
+//      .collect(Collectors.toList());
+//    if (colaboradoresDto.isEmpty()) {
+//      throw new PDIBusinessRuleException("Colaborador não encontrado.");
+//    }
+//    return colaboradoresDto;
+//  }
+//
+//  public Candidato atualizarColaboradorPorId(UUID id, ColaboradorRequestDto data) {
+//    Colaborador colaborador = colaboradorRepository.findById(id)
+//      .orElseThrow(() -> new ItemNotFoundException("Colaborador", id));
+//
+//    MetricasDesempenho metricasDesempenho = metricasDesempenhoRepositoryJpa.findById(data.metricasDesempenhoId())
+//      .orElseThrow(() -> new ItemNotFoundException("MétricasDesempenho", data.metricasDesempenhoId()));
+//
+//    Cargo cargo = cargoRepositoryJpa.findById(data.cargoId())
+//      .orElseThrow(() -> new ItemNotFoundException("Cargo", data.cargoId()));
+//
+//    verificarNulidadeMetricasDesempenho(metricasDesempenho);
+//    verificarCargoAtivo(cargo);
+//    colaborador.atualizarCom(data, metricasDesempenho, cargo);
+//
+//    return colaboradorRepository.save(colaborador);
+//  }
 
   public Colaborador atualizarEmailPorId(UUID id, EmailDto email) {
     Colaborador colaborador = colaboradorRepository.findById(id)

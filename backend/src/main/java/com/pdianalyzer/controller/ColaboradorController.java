@@ -5,6 +5,8 @@ import com.pdianalyzer.domain.DTO.ColaboradorRequestDto;
 import com.pdianalyzer.domain.DTO.EmailDto;
 import com.pdianalyzer.domain.model.Colaborador;
 import com.pdianalyzer.service.ColaboradorService;
+import com.smarthirepro.core.service.impl.CandidatoService;
+import com.smarthirepro.domain.model.Curriculo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,11 +22,18 @@ import java.util.UUID;
 public class ColaboradorController {
 
   private final ColaboradorService colaboradorService;
+  private final CandidatoService candidatoService;
 
   @PostMapping
   public ResponseEntity<Colaborador> salvar(@Valid @RequestBody Colaborador colaborador) {
     Colaborador novoColaborador = colaboradorService.salvar(colaborador);
     return ResponseEntity.status(HttpStatus.CREATED).body(novoColaborador);
+  }
+
+  @PostMapping("/criarComCurriculo/{idCargo}")
+  public ResponseEntity<HttpStatus> criarColaboradorComCurriculo(@Valid @RequestBody Curriculo curriculo, UUID idCargo) {
+    candidatoService.criarComCurriculo(curriculo, idCargo);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @GetMapping("/me")
@@ -33,17 +42,17 @@ public class ColaboradorController {
     return ResponseEntity.ok(colaboradores);
   }
 
-  @GetMapping("/buscar")
-  public ResponseEntity<List<ColaboradorDto>> buscarPorNome(@RequestParam("nome") String nome) {
-    List<ColaboradorDto> colaboradores = colaboradorService.buscarCandidatoPorNome(nome);
-    return ResponseEntity.ok(colaboradores);
-  }
-
-  @PutMapping("/{id}")
-  public ResponseEntity<?> atualizarColaborador(@PathVariable UUID id, @Valid @RequestBody ColaboradorRequestDto data) {
-    colaboradorService.atualizarColaboradorPorId(id, data);
-    return ResponseEntity.ok().build();
-  }
+//  @GetMapping("/buscar")
+//  public ResponseEntity<List<ColaboradorDto>> buscarPorNome(@RequestParam("nome") String nome) {
+//    List<ColaboradorDto> colaboradores = colaboradorService.buscarCandidatoPorNome(nome);
+//    return ResponseEntity.ok(colaboradores);
+//  }
+//
+//  @PutMapping("/{id}")
+//  public ResponseEntity<?> atualizarColaborador(@PathVariable UUID id, @Valid @RequestBody ColaboradorRequestDto data) {
+//    colaboradorService.atualizarColaboradorPorId(id, data);
+//    return ResponseEntity.ok().build();
+//  }
 
   @PatchMapping("/{id}/email")
   public ResponseEntity<Colaborador> atualizarEmailDoColaborador(@PathVariable UUID id, @Valid @RequestBody EmailDto email) {
