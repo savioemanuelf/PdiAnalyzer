@@ -1,6 +1,7 @@
 package com.pdianalyzer.controller;
 
 import com.pdianalyzer.domain.DTO.NivelDto;
+import com.pdianalyzer.domain.DTO.NivelResponseDto;
 import com.pdianalyzer.domain.model.Nivel;
 import com.pdianalyzer.service.NivelService;
 import jakarta.validation.Valid;
@@ -20,14 +21,14 @@ public class NivelController {
   private final NivelService nivelService;
 
   @PostMapping
-  public ResponseEntity<Nivel> criarNovoNivel(@Valid @RequestBody NivelDto nivelDto) {
-    Nivel novoNivel = nivelService.criarNivel(nivelDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(novoNivel);
+  public ResponseEntity<?> criarNovoNivel(@Valid @RequestBody NivelDto nivelDto) {
+    NivelDto nivel = nivelService.criarNivel(nivelDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(nivel);
   }
 
   @GetMapping("/trilha/{trilhaId}")
-  public ResponseEntity<List<Nivel>> listarNiveisPorTrilha(@PathVariable UUID trilhaId) {
-    List<Nivel> niveis = nivelService.listarNiveisPorTrilha(trilhaId);
+  public ResponseEntity<List<NivelResponseDto>> listarNiveisPorTrilha(@PathVariable UUID trilhaId) {
+    List<NivelResponseDto> niveis = nivelService.listarNiveisPorTrilha(trilhaId);
     return ResponseEntity.ok(niveis);
   }
 }

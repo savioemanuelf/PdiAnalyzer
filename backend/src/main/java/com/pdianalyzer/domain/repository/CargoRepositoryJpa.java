@@ -21,4 +21,6 @@ public interface CargoRepositoryJpa extends JpaRepository<Cargo, UUID>, CargoRep
     List<Cargo> findByNomeContainingIgnoreCaseAndEmpresaId(String nome, UUID empresaId);
 
     void deleteAllByEmpresaId(UUID id);
+
+    boolean existsByNivelId(UUID nivelId);
 }

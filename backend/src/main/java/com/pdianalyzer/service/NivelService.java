@@ -1,6 +1,7 @@
 package com.pdianalyzer.service;
 
 import com.pdianalyzer.domain.DTO.NivelDto;
+import com.pdianalyzer.domain.DTO.NivelResponseDto;
 import com.pdianalyzer.domain.model.CargoCompetencias;
 import com.pdianalyzer.domain.model.Nivel;
 import com.pdianalyzer.domain.model.TrilhaDeCarreira;
@@ -23,7 +24,7 @@ public class NivelService {
   private final TrilhaDeCarreiraRepositoryJpa trilhaDeCarreiraRepository;
 
   @Transactional
-  public Nivel criarNivel(NivelDto dto) {
+  public NivelDto criarNivel(NivelDto dto) {
     TrilhaDeCarreira trilha = trilhaDeCarreiraRepository.findById(dto.trilhaDeCarreiraId())
       .orElseThrow(() -> new ItemNotFoundException("Trilha de Carreira", dto.trilhaDeCarreiraId()));
 
@@ -51,13 +52,24 @@ public class NivelService {
       .findFirst()
       .ifPresent(nivelAnterior -> nivelAnterior.setProximoNivel(nivel));
 
-    return nivelRepository.save(nivel);
+    nivelRepository.save(nivel);
+    return dto;
   }
 
-  public List<Nivel> listarNiveisPorTrilha(UUID trilhaId) {
+  public List<NivelResponseDto> listarNiveisPorTrilha(UUID trilhaId) {
     if (!trilhaDeCarreiraRepository.existsById(trilhaId)) {
       throw new ItemNotFoundException("Trilha de Carreira", trilhaId);
     }
-    return nivelRepository.findByTrilhaDeCarreiraIdOrderByOrdemAsc(trilhaId);
+    return nivelRepository.findAllByTrilhaDeCarreiraIdOrderByOrdemAsc(trilhaId)
+      .stream()
+      .map(nivel -> new NivelResponseDto(
+        nivel.getId(),
+        nivel.getSenioridade(),
+        nivel.getOrdem(),
+        nivel.getTrilhaDeCarreira().getId(),
+        nivel.getCargoCompetencias().getCompetenciasTecnicas(),
+        nivel.getCargoCompetencias().getCompetenciasPessoais()
+      ))
+      .toList();
   }
 }

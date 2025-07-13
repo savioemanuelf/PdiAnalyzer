@@ -53,12 +53,9 @@ public class ColaboradorService {
     CargoDto cargoDto = null;
     if (cargo != null) {
       cargoDto = new CargoDto(
-        cargo.getId(),
         cargo.getNome(),
-        cargo.getEmpresa().getId(),
         cargo.isActive(),
         cargo.getRequisitos().getHabilidades(),
-        cargo.getTrilhaDeCarreira().getId(),
         cargo.getNivel().getId()
       );
     }

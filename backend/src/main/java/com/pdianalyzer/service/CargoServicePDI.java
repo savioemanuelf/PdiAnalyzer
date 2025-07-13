@@ -2,6 +2,7 @@ package com.pdianalyzer.service;
 
 import com.pdianalyzer.domain.DTO.CargoDto;
 import com.pdianalyzer.domain.model.Cargo;
+import com.pdianalyzer.domain.model.CargoCompetencias;
 import com.pdianalyzer.domain.model.Nivel;
 import com.pdianalyzer.domain.model.TrilhaDeCarreira;
 import com.pdianalyzer.domain.repository.CargoRepositoryJpa;
@@ -27,6 +28,7 @@ public class CargoServicePDI {
 
 
   private final TrilhaDeCarreiraRepositoryJpa trilhaDeCarreiraRepository;
+  private final CargoRepositoryJpa cargoRepositoryJpa;
   private final NivelRepositoryJpa nivelRepositoryJpa;
   private final EmpresaRepository empresaRepository;
 
@@ -41,22 +43,31 @@ public class CargoServicePDI {
     Empresa empresa = empresaRepository.findById(empresaId)
       .orElseThrow(() -> new ItemNotFoundException("Empresa", empresaId));
 
-    TrilhaDeCarreira trilha = trilhaDeCarreiraRepository.findById(dto.trilhaDeCarreiraId())
-      .orElseThrow(() -> new PDIBusinessRuleException("Um cargo deve estar vinculado a uma trilha de carreira. Trilha não encontrada com ID: " + dto.trilhaDeCarreiraId()));
-
     Nivel nivel = nivelRepositoryJpa.findById(dto.nivelId())
-      .orElseThrow(() -> new PDIBusinessRuleException("Um cargo deve estar vinculado a um nível na trilha de carreira. Nível não encontrado com ID: " + dto.trilhaDeCarreiraId()));
+      .orElseThrow(() -> new PDIBusinessRuleException("Um cargo deve estar vinculado a um nível na trilha de carreira. Nível não encontrado com ID: " + dto.nivelId()));
+
+    TrilhaDeCarreira trilha = trilhaDeCarreiraRepository.findById(nivel.getTrilhaDeCarreira().getId())
+      .orElseThrow(() -> new PDIBusinessRuleException("Nível não pertence a uma trilha de carreira válida. Trilha não encontrada com ID: " + nivel.getTrilhaDeCarreira().getId()));
 
     if (!nivel.getTrilhaDeCarreira().getId().equals(trilha.getId())) {
       throw new PDIBusinessRuleException("O Nível com ID " + nivel.getId() + " não pertence à Trilha de Carreira " + trilha.getNome());
+    }
+
+    boolean nivelEmUso = cargoRepositoryJpa.existsByNivelId(nivel.getId());
+    if (nivelEmUso) {
+      throw new PDIBusinessRuleException("O Nível com ID " + nivel.getId() + " já está vinculado a outro cargo.");
     }
 
     Cargo cargo = new Cargo();
     cargo.setNome(dto.nome());
     cargo.setEmpresa(empresa);
     cargo.setActive(dto.isActive());
-    cargo.getRequisitos().setHabilidades(dto.habilidades());
 
+    CargoCompetencias requisitos = new CargoCompetencias();
+    requisitos.setHabilidades(dto.habilidades());
+    requisitos.setCargo(cargo);
+
+    cargo.setRequisitos(requisitos);
     cargo.setNivel(nivel);
     cargo.setTrilhaDeCarreira(trilha);
     return cargoRepository.save(cargo);
@@ -67,8 +78,5 @@ public class CargoServicePDI {
     return cargoRepository.findByEmpresaId(empresaId);
   }
 
-
-  // salvar(Cargo cargo)
   // listarTodosPorTrilha(UUID trilhaId)
-  // etc
 }

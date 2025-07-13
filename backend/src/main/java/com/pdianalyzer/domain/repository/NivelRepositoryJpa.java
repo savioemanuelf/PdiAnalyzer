@@ -7,5 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface NivelRepositoryJpa extends JpaRepository<Nivel, UUID> {
-  List<Nivel> findByTrilhaDeCarreiraIdOrderByOrdemAsc(UUID trilhaId);
+
+  List<Nivel> findAllByTrilhaDeCarreiraIdOrderByOrdemAsc(UUID trilhaId);
 }
