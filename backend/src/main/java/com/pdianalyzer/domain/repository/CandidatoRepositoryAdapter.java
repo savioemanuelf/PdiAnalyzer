@@ -17,12 +17,22 @@ public class CandidatoRepositoryAdapter implements com.smarthirepro.domain.repos
 
   @Override
   public Optional<Candidato> findByEmail(String email) {
-    return colaboradorRepositoryJpa.findByEmail(email);
+    return (Optional) colaboradorRepositoryJpa.findByEmail(email);
   }
 
   @Override
   public Colaborador save(Candidato candidato) {
-    return colaboradorRepositoryJpa.save((Colaborador) candidato);
+    if (candidato instanceof Colaborador) {
+      return colaboradorRepositoryJpa.save((Colaborador) candidato);
+    }
+    Colaborador colaborador = new Colaborador();
+    colaborador.setNome(candidato.getNome());
+    colaborador.setEmail(candidato.getEmail());
+    colaborador.setTelefone(candidato.getTelefone());
+    colaborador.setCurriculo(candidato.getCurriculo());
+    colaborador.setCargo(candidato.getCargo());
+
+    return colaboradorRepositoryJpa.save(colaborador);
   }
 }
 

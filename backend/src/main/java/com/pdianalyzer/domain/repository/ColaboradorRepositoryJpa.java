@@ -3,6 +3,7 @@ package com.pdianalyzer.domain.repository;
 import com.pdianalyzer.domain.model.Colaborador;
 import com.smarthirepro.domain.model.Candidato;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,7 +16,11 @@ public interface ColaboradorRepositoryJpa
 
     Optional<Candidato> findByEmail(String email);
 
-    List<Colaborador> findByCargo_Empresa_Id(UUID empresaId);
+    @Query("SELECT c FROM Colaborador c JOIN c.cargo cargo " +
+            "JOIN cargo.nivel nivel " +
+            "JOIN nivel.trilhaDeCarreira trilha " +
+            "WHERE trilha.empresa.id = :empresaId")
+    List<Colaborador> findByEmpresaId(UUID empresaId);
 
     List<Colaborador> findByNomeContainingIgnoreCase(String nomeColaborador);
 }

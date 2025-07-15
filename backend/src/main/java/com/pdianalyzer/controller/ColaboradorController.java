@@ -1,17 +1,18 @@
 package com.pdianalyzer.controller;
 
 import com.pdianalyzer.domain.DTO.ColaboradorDto;
-import com.pdianalyzer.domain.DTO.ColaboradorRequestDto;
 import com.pdianalyzer.domain.DTO.EmailDto;
 import com.pdianalyzer.domain.model.Colaborador;
 import com.pdianalyzer.service.ColaboradorService;
 import com.smarthirepro.core.service.impl.CandidatoService;
+import com.smarthirepro.core.service.impl.CurriculoService;
 import com.smarthirepro.domain.model.Curriculo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,17 +24,16 @@ public class ColaboradorController {
 
   private final ColaboradorService colaboradorService;
   private final CandidatoService candidatoService;
-
-  @PostMapping
-  public ResponseEntity<Colaborador> salvar(@Valid @RequestBody Colaborador colaborador) {
-    Colaborador novoColaborador = colaboradorService.salvar(colaborador);
-    return ResponseEntity.status(HttpStatus.CREATED).body(novoColaborador);
-  }
+  private final CurriculoService curriculoService;
 
   @PostMapping("/criarComCurriculo/{idCargo}")
-  public ResponseEntity<HttpStatus> criarColaboradorComCurriculo(@Valid @RequestBody Curriculo curriculo, UUID idCargo) {
-    candidatoService.criarComCurriculo(curriculo, idCargo);
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+  public ResponseEntity<?> analisarCurriculos(@PathVariable("idCargo") UUID idVaga,
+                                              @RequestParam("file") MultipartFile file) {
+
+    String path = curriculoService.pegarCaminhoDoCurriculo(file, idVaga);
+
+    List<Curriculo> result = curriculoService.salvarCurriculo(path, idVaga);
+    return ResponseEntity.ok(result);
   }
 
   @GetMapping("/me")

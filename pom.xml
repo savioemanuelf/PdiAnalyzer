@@ -89,12 +89,12 @@
 		<dependency>
 			<groupId>com.github.Aerttyz.SmartHire-PRO</groupId>
 			<artifactId>smarthirepro-domain</artifactId>
-			<version>7fcb26a4dba778e4801dda44caa19e89e7e03295</version>
+			<version>00c4688420</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.Aerttyz.SmartHire-PRO</groupId>
 			<artifactId>smarthire-pro-core</artifactId>
-			<version>7fcb26a4dba778e4801dda44caa19e89e7e03295</version>
+			<version>00c4688420</version>
 		</dependency>
 	</dependencies>
 	<repositories>

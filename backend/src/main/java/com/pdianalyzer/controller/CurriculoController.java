@@ -21,13 +21,13 @@ public class CurriculoController {
   @Autowired
   private CurriculoService curriculoService;
 
-  @PostMapping("/analisar-curriculos/{idVaga}")
-  public ResponseEntity<?> analisarCurriculos(@PathVariable("idVaga") UUID idVaga,
+  @PostMapping("/analisar-curriculos/{idCargo}")
+  public ResponseEntity<?> analisarCurriculos(@PathVariable("idCargo") UUID idCargo,
                                               @RequestParam("file") MultipartFile file) {
 
-    String path = curriculoService.pegarCaminhoDoCurriculo(file, idVaga);
+    String path = curriculoService.pegarCaminhoDoCurriculo(file, idCargo);
 
-    List<Curriculo> result = curriculoService.salvarCurriculo(path, idVaga);
+    List<Curriculo> result = curriculoService.salvarCurriculo(path, idCargo);
     return ResponseEntity.ok(result);
   }
 }

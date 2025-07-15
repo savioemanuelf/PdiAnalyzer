@@ -85,7 +85,10 @@ public class ColaboradorService {
 
   public List<ColaboradorDto> listarTodosPorEmpresaId() {
     UUID empresaId = AuthUtils.getEmpresaId();
-    List<Colaborador> colaboradores = colaboradorRepository.findByCargo_Empresa_Id(empresaId);
+    List<Colaborador> colaboradores = colaboradorRepository.findByEmpresaId(empresaId);
+    if (colaboradores.isEmpty()) {
+      throw new PDIBusinessRuleException("Nenhum colaborador encontrado para a empresa com ID: " + empresaId);
+    }
     return colaboradores.stream()
       .map(c -> {
         try {
