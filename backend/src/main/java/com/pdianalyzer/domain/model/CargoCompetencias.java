@@ -20,4 +20,7 @@ public class CargoCompetencias extends CargoCompetenciasGenerico {
 
   @Column(name = "competencias_pessoais")
   private String competenciasPessoais;
+
+  @Column(name = "certificacoes")
+  private String certificacoes;
 }

@@ -8,6 +8,7 @@ import com.pdianalyzer.domain.DTO.MetricasDesempenhoDTO;
 import com.pdianalyzer.domain.model.Cargo;
 import com.pdianalyzer.domain.model.Colaborador;
 import com.pdianalyzer.domain.model.MetricasDesempenho;
+import com.pdianalyzer.domain.model.Nivel;
 import com.pdianalyzer.domain.repository.CargoRepositoryJpa;
 import com.pdianalyzer.domain.repository.ColaboradorRepositoryJpa;
 import com.pdianalyzer.domain.repository.EmpresaRepositoryJpa;
@@ -187,5 +188,14 @@ public class ColaboradorService {
     if (!cargo.isActive()) {
       throw new PDIBusinessRuleException("Esse cargo não está ativo.");
     }
+  }
+  public Nivel getProximoNivel(UUID colaboradorId) {
+    Colaborador colaborador = colaboradorRepository.findById(colaboradorId)
+      .orElseThrow(() -> new ItemNotFoundException("Colaborador", colaboradorId));
+    Nivel nivel = colaborador.getCargo().getNivel().getProximoNivel();
+    if (nivel == null) {
+      throw new PDIBusinessRuleException("Não há próximo nível definido para o colaborador.");
+    }
+    return nivel;
   }
 }

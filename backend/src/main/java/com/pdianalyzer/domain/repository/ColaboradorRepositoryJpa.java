@@ -23,4 +23,6 @@ public interface ColaboradorRepositoryJpa
     List<Colaborador> findByEmpresaId(UUID empresaId);
 
     List<Colaborador> findByNomeContainingIgnoreCase(String nomeColaborador);
+
+    Optional<Colaborador> findByCargo_Id(UUID cargoId);
 }
