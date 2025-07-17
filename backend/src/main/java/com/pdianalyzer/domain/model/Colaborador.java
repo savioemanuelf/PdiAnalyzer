@@ -3,25 +3,12 @@ package com.pdianalyzer.domain.model;
 import com.pdianalyzer.domain.DTO.ColaboradorRequestDto;
 import com.pdianalyzer.exception.PDIBusinessRuleException;
 import com.smarthirepro.domain.model.Candidato;
-import com.smarthirepro.domain.model.Curriculo;
-import com.smarthirepro.domain.model.Empresa;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.mapping.ToOne;
-
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -58,7 +45,7 @@ public class Colaborador extends Candidato {
     @JoinColumn(name = "metricas_desempenho_id")
     public MetricasDesempenho metricasDesempenho;
 
-    public void atualizarCom(ColaboradorRequestDto data, MetricasDesempenho metricasDesempenho, Cargo cargo) {
+    public void atualizarColaborador(ColaboradorRequestDto data, MetricasDesempenho metricasDesempenho, Cargo cargo) {
         this.setNome(data.nome());
         this.setEmail(data.email());
         this.setTelefone(data.telefone());

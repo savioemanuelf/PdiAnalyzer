@@ -2,9 +2,7 @@ package com.pdianalyzer.service;
 
 import com.pdianalyzer.domain.DTO.CargoDto;
 import com.pdianalyzer.domain.DTO.ColaboradorDto;
-import com.pdianalyzer.domain.DTO.ColaboradorRequestDto;
 import com.pdianalyzer.domain.DTO.EmailDto;
-import com.pdianalyzer.domain.DTO.MetricasDesempenhoDTO;
 import com.pdianalyzer.domain.model.Cargo;
 import com.pdianalyzer.domain.model.Colaborador;
 import com.pdianalyzer.domain.model.MetricasDesempenho;
@@ -125,7 +123,7 @@ public class ColaboradorService {
 //
 //    verificarNulidadeMetricasDesempenho(metricasDesempenho);
 //    verificarCargoAtivo(cargo);
-//    colaborador.atualizarCom(data, metricasDesempenho, cargo);
+//    colaborador.atualizarColaborador(data, metricasDesempenho, cargo);
 //
 //    return colaboradorRepository.save(colaborador);
 //  }

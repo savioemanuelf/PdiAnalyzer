@@ -45,7 +45,6 @@ public class NivelService {
     nivel.setTrilhaDeCarreira(trilha);
     nivel.setCargoCompetencias(competencias);
 
-    // Lógica para definir o próximo nível (sucessão)
     // Busca o nível anterior na mesma trilha para linkar
     trilha.getNiveis().stream()
       .filter(n -> n.getOrdem() == dto.ordem() - 1)

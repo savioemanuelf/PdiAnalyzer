@@ -2,7 +2,6 @@ package com.pdianalyzer.controller;
 
 import com.pdianalyzer.domain.DTO.NivelDto;
 import com.pdianalyzer.domain.DTO.NivelResponseDto;
-import com.pdianalyzer.domain.model.Nivel;
 import com.pdianalyzer.service.NivelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

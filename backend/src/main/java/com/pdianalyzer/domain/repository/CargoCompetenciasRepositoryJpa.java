@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface CargoCompetenciasRepositoryJpa extends JpaRepository<CargoCompetencias, UUID> {
+public interface CargoCompetenciasRepositoryJpa extends JpaRepository<CargoCompetencias, String> {
     CargoCompetencias findByCargoId(UUID cargoId);
 
     @Query("""

@@ -13,7 +13,6 @@ import com.pdianalyzer.exception.ItemNotFoundException;
 import com.pdianalyzer.exception.PDIBusinessRuleException;
 import com.smarthirepro.core.exception.FlaskConnectionException;
 import com.smarthirepro.core.service.impl.AnaliseTemplate;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -25,12 +24,11 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class PDIAnalise extends AnaliseTemplate<Cargo> {
+public class PDIAnaliseService extends AnaliseTemplate<Cargo> {
 
   private final CargoCompetenciasRepositoryJpa cargoCompetenciasRepository;
   private final ColaboradorRepositoryJpa colaboradorRepositoryJpa;
@@ -42,21 +40,30 @@ public class PDIAnalise extends AnaliseTemplate<Cargo> {
   private final ColaboradorService colaboradorService;
 
   @Override
-  public List<String> definirCriterios(UUID proximoNivelId) {
+  public List<String> definirCriterios(UUID cargoId) {
     List<String> competenciasNecessarias = new ArrayList<>();
 
-    Nivel nivel = nivelRepository.findById(proximoNivelId)
-      .orElseThrow(() -> new ItemNotFoundException("Próximo nível", proximoNivelId));
+    // preciso receber o cargoId e dar um jeito de chegar no colaborador
+
+    Colaborador colaborador = colaboradorRepositoryJpa.findByCargoId(cargoId)
+      .orElseThrow(() -> new ItemNotFoundException("Colaborador ", cargoId));
+
+    Nivel nivelAtual = colaborador.getCargo().getNivel();
+
+    Nivel nivel = nivelAtual.getProximoNivel();
+    if (nivel == null) {
+      throw new PDIBusinessRuleException("Colaborador está no último nível da carreira.");
+    }
     int nivelOrdem = nivel.getOrdem();
-    UUID cargoCompetenciasId = UUID.fromString(nivel.getCargoCompetencias().getId());
+    String cargoCompetenciasId = nivel.getCargoCompetencias().getId();
     CargoCompetencias cargoCompetencias = cargoCompetenciasRepository.findById(cargoCompetenciasId)
-      .orElseThrow(() -> new ItemNotFoundException("Cargo não encontrado com ID: ", cargoCompetenciasId));
+      .orElseThrow(() -> new PDIBusinessRuleException("Item não encontrado: Cargo Competências com ID: " + cargoCompetenciasId));
 
 
-    if (nivelOrdem == 1) {
+    if (nivelOrdem >= 2) {
       competenciasNecessarias.add("Competências Técnicas: " + cargoCompetencias.getCompetenciasTecnicas());
       competenciasNecessarias.add("Competências Comportamentais: " + cargoCompetencias.getCompetenciasPessoais());
-    } else if (nivelOrdem >= 2 && nivelOrdem < 4) {
+    } else if (nivelOrdem >= 3 && nivelOrdem <= 4) {
       competenciasNecessarias.add("Competências Técnicas: " + cargoCompetencias.getCompetenciasTecnicas());
       competenciasNecessarias.add("Competências Comportamentais: " + cargoCompetencias.getCompetenciasPessoais());
       competenciasNecessarias.add("Competências de Idiomas: " + cargoCompetencias.getIdiomas());
@@ -71,13 +78,13 @@ public class PDIAnalise extends AnaliseTemplate<Cargo> {
 
 
   @Override
-  public String executarAnalise(UUID colaboradorId, List<String> competenciasNecessarias) {
-    String flaskUrl = "http://localhost:5000/compare_resumes"; // criar endpoint de análise de métricas
-    Colaborador colaborador = colaboradorRepositoryJpa.findById(colaboradorId)
-      .orElseThrow(() -> new ItemNotFoundException("Colaborador não encontrado com ID: ", colaboradorId));
-    Nivel proximoNivel = colaboradorService.getProximoNivel(colaboradorId);
+  public String executarAnalise(UUID cargoId, List<String> competenciasNecessarias) {
+    String flaskUrl = "http://localhost:5000/avaliar_progressao"; // criar endpoint de análise de métricas
+    Colaborador colaborador = colaboradorRepositoryJpa.findByCargoId(cargoId)
+      .orElseThrow(() -> new ItemNotFoundException("Colaborador (cargoId) ", cargoId));
+    Nivel proximoNivel = colaboradorService.getProximoNivel(colaborador.getId());
     if (proximoNivel == null) {
-      throw new PDIBusinessRuleException("Não há próximo nível definido para o colaborador.");
+      throw new PDIBusinessRuleException("O colaborador já está no último nível da carreira.");
     }
     MetricasDesempenho desempenho = colaborador.getMetricasDesempenho();
 
@@ -98,10 +105,4 @@ public class PDIAnalise extends AnaliseTemplate<Cargo> {
     }
   }
 
-  @Override
-  public String criarRelatorio(String resultado) {
-    // Implementar a lógica de criação do relatório
-
-    return null;
-  }
 }

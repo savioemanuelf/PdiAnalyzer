@@ -4,6 +4,7 @@ import com.pdianalyzer.domain.model.Colaborador;
 import com.smarthirepro.domain.model.Candidato;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,4 +26,7 @@ public interface ColaboradorRepositoryJpa
     List<Colaborador> findByNomeContainingIgnoreCase(String nomeColaborador);
 
     Optional<Colaborador> findByCargo_Id(UUID cargoId);
+
+    @Query("SELECT c FROM Colaborador c WHERE c.cargo.id = :cargoId")
+    Optional<Colaborador> findByCargoId(@Param("cargoId") UUID cargoId);
 }
