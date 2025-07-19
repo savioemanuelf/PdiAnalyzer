@@ -45,6 +45,10 @@ public class Colaborador extends Candidato {
     @JoinColumn(name = "metricas_desempenho_id")
     public MetricasDesempenho metricasDesempenho;
 
+    @OneToOne
+    @JoinColumn(name = "pdi_id")
+    public PlanoDesenvolvimento pdi;
+
     public void atualizarColaborador(ColaboradorRequestDto data, MetricasDesempenho metricasDesempenho, Cargo cargo) {
         this.setNome(data.nome());
         this.setEmail(data.email());

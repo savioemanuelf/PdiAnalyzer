@@ -42,18 +42,6 @@ public class ColaboradorController {
     return ResponseEntity.ok(colaboradores);
   }
 
-//  @GetMapping("/buscar")
-//  public ResponseEntity<List<ColaboradorDto>> buscarPorNome(@RequestParam("nome") String nome) {
-//    List<ColaboradorDto> colaboradores = colaboradorService.buscarCandidatoPorNome(nome);
-//    return ResponseEntity.ok(colaboradores);
-//  }
-//
-//  @PutMapping("/{id}")
-//  public ResponseEntity<?> atualizarColaborador(@PathVariable UUID id, @Valid @RequestBody ColaboradorRequestDto data) {
-//    colaboradorService.atualizarColaboradorPorId(id, data);
-//    return ResponseEntity.ok().build();
-//  }
-
   @PatchMapping("/{id}/email")
   public ResponseEntity<Colaborador> atualizarEmailDoColaborador(@PathVariable UUID id, @Valid @RequestBody EmailDto email) {
     Colaborador colaboradorAtualizado = colaboradorService.atualizarEmailPorId(id, email);

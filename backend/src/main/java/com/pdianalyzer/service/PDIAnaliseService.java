@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -42,8 +43,6 @@ public class PDIAnaliseService extends AnaliseTemplate<Cargo> {
   @Override
   public List<String> definirCriterios(UUID cargoId) {
     List<String> competenciasNecessarias = new ArrayList<>();
-
-    // preciso receber o cargoId e dar um jeito de chegar no colaborador
 
     Colaborador colaborador = colaboradorRepositoryJpa.findByCargoId(cargoId)
       .orElseThrow(() -> new ItemNotFoundException("Colaborador ", cargoId));
@@ -79,7 +78,7 @@ public class PDIAnaliseService extends AnaliseTemplate<Cargo> {
 
   @Override
   public String executarAnalise(UUID cargoId, List<String> competenciasNecessarias) {
-    String flaskUrl = "http://localhost:5000/avaliar_progressao"; // criar endpoint de análise de métricas
+    String flaskUrl = "http://localhost:5000/avaliar"; // criar endpoint de análise de métricas
     Colaborador colaborador = colaboradorRepositoryJpa.findByCargoId(cargoId)
       .orElseThrow(() -> new ItemNotFoundException("Colaborador (cargoId) ", cargoId));
     Nivel proximoNivel = colaboradorService.getProximoNivel(colaborador.getId());
@@ -90,11 +89,15 @@ public class PDIAnaliseService extends AnaliseTemplate<Cargo> {
 
 
     List<String> analiseRequest = promptService.gerarPromptDeAnaliseDeGaps(colaborador, proximoNivel, desempenho, competenciasNecessarias);
+    String promptTexto = analiseRequest.get(0);
+
     try {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
 
-      HttpEntity<List<String>> requestEntity = new HttpEntity<>(analiseRequest, headers);
+      Map<String, String> payload = Map.of("prompt", promptTexto);
+
+      HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(payload, headers);
 
       ResponseEntity<String> response = restTemplate.postForEntity(flaskUrl, requestEntity, String.class);
       return response.getBody();

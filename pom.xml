@@ -87,14 +87,39 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-calendar</artifactId>
+			<version>v3-rev20231215-2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>1.23.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.oauth-client</groupId>
+			<artifactId>google-oauth-client-jetty</artifactId>
+			<version>1.35.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.github.Aerttyz.SmartHire-PRO</groupId>
 			<artifactId>smarthirepro-domain</artifactId>
-			<version>387ead5</version>
+			<version>83186e2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.Aerttyz.SmartHire-PRO</groupId>
 			<artifactId>smarthire-pro-core</artifactId>
-			<version>387ead5</version>
+			<version>83186e2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.Aerttyz.SmartHire-PRO</groupId>
+			<artifactId>smarthire-pro-core</artifactId>
+			<version>83186e2</version>
 		</dependency>
 	</dependencies>
 	<repositories>
